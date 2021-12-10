@@ -108,7 +108,7 @@
             </div>
 
             <div class="mt-px">
-              <StarRatings />
+              <StarRating />
             </div>
           </div>
         </div>
