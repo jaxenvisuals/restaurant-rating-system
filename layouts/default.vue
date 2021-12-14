@@ -1,7 +1,18 @@
 <template>
   <div class="min-h-screen">
     <div
-      class="fixed top-0 left-0 z-10 flex justify-center w-full py-6 bg-white"
+      class="
+        fixed
+        top-0
+        left-0
+        z-10
+        flex
+        justify-center
+        w-full
+        py-6
+        bg-white/40
+        backdrop-blur-md
+      "
     >
       <div class="flex justify-between w-4/5">
         <div class="w-2/5">

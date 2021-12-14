@@ -84,7 +84,14 @@
 
           <div class="mt-3 text-black">
             <div
-              class="inline-flex px-2 py-px text-xs text-black rounded-sm  bg-app-gray-100"
+              class="
+                inline-flex
+                px-2
+                py-px
+                text-xs text-black
+                rounded-sm
+                bg-app-gray-100
+              "
             >
               <span class="inline-block mr-1">
                 <MaterialIcon icon="emoji_events" class="text-xs" />

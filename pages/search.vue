@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center w-full mt-20">
+  <div class="flex flex-col items-center w-full mt-[94px]">
     <div class="w-4/5 mt-6">
       <div class="">
         <div class="text-xl">15 Search Results for Subway</div>
@@ -11,7 +11,14 @@
 
           <div class="mt-3 text-black">
             <div
-              class="inline-flex px-2 py-px text-xs text-black rounded-sm  bg-app-gray-100"
+              class="
+                inline-flex
+                px-2
+                py-px
+                text-xs text-black
+                rounded-sm
+                bg-app-gray-100
+              "
             >
               <span class="inline-block mr-1">
                 <MaterialIcon icon="emoji_events" class="text-xs" />
