@@ -1,6 +1,9 @@
 <template>
   <div class="flex items-center">
-    <div class="flex items-center mr-1 text-brand-yellow">
+    <div
+      class="flex items-center mr-1 text-brand-yellow"
+      :class="[{ 'gap-2': !tight }]"
+    >
       <MaterialIcon icon="star" :class="[starSize]" />
       <MaterialIcon icon="star" :class="[starSize]" />
       <MaterialIcon icon="star" :class="[starSize]" />
@@ -17,10 +20,15 @@
 
 <script>
 export default {
-  name: 'StarRatings',
+  name: 'StarRating',
 
   props: {
     count: {
+      type: Boolean,
+      default: true,
+    },
+
+    tight: {
       type: Boolean,
       default: true,
     },
@@ -37,6 +45,14 @@ export default {
       switch (this.size) {
         case 'md':
           size = 'text-base'
+          break
+
+        case 'lg':
+          size = 'text-lg'
+          break
+
+        case 'xl':
+          size = 'text-3xl'
           break
 
         default:
