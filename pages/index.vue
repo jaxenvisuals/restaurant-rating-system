@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center w-full mt-40">
+  <div v-if="false" class="flex flex-col items-center w-full mt-40">
     <div class="text-center text-black">
       <p class="text-6xl">Find a Restaurant</p>
 
@@ -127,5 +127,8 @@
 <script>
 export default {
   name: 'LandingPage',
+  mounted() {
+    this.$router.push('/home')
+  },
 }
 </script>
