@@ -15,7 +15,8 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
     "core-js": "^3.15.1",
-    "nuxt": "^2.15.7"
+    "nuxt": "^2.15.7",
+    "vuelidate": "^0.7.7"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
@@ -36,6 +37,8 @@
     "stylelint": "^13.13.1",
     "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-standard": "^22.0.0",
+    "uuid": "^8.3.2",
+    "vue-clickaway": "^2.2.2",
     "vue-jest": "^3.0.4"
   }
 }
