@@ -1,118 +1,77 @@
 <template>
   <div>
-    <div class="bg-[#c4c4c4] py-28 flex justify-center mt-[94px]">
-      <div class="flex flex-col items-center justify-center w-4/5 text-black">
-        <div class="text-center">
-          <p class="text-4xl">We Direct you to the</p>
-          <p class="mt-2 font-bold text-8xl">Right Restaurant</p>
-        </div>
-
-        <div class="w-3/5 mt-6 text-center">
-          <p class="text-sm">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Reprehenderit exercitationem molestias unde nisi tempore laborum
-            sint veniam in aperiam. Tenetur pariatur quos eveniet praesentium,
-            assumenda libero officia et facilis cupiditate.
-          </p>
-
-          <div class="flex justify-center gap-3 mt-6">
-            <div
-              class="
-                px-5
-                py-3
-                text-sm
-                font-bold
-                leading-snug
-                text-black
-                border border-black
-                rounded-full
-              "
-            >
-              Create Account
-            </div>
-
-            <div
-              class="
-                px-5
-                py-3
-                text-sm
-                font-bold
-                leading-snug
-                text-black
-                border border-black
-                rounded-full
-              "
-            >
-              Login
-            </div>
-          </div>
-        </div>
-      </div>
+    <div v-if="!loaded" class="mt-[150px] text-center font-bold text-sm">
+      Loading...
     </div>
+    <div v-else>
+      <div class="bg-[#c4c4c4] flex justify-center mt-[94px] relative">
+        <img
+          class="absolute object-cover w-full h-full"
+          :src="'https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'"
+        />
 
-    <div class="relative w-4/5 mx-auto top-[-90px]">
-      <div class="">
-        <div class="text-xl">Browse Restaurants</div>
-      </div>
-
-      <div class="flex flex-col gap-3 mt-6">
         <div
-          v-for="i in 6"
-          :key="i"
-          class="overflow-hidden bg-white border rounded-xl"
+          class="absolute top-0 left-0 w-full h-full bg-black opacity-40"
+        ></div>
+
+        <div
+          class="
+            py-28
+            relative
+            flex flex-col
+            items-center
+            justify-center
+            w-4/5
+            text-white
+          "
         >
-          <div
-            class="
-              px-3
-              py-1
-              text-xs
-              font-bold
-              bg-[#c4c4c4] bg-opacity-25
-              uppercase
-              border-b
-            "
-          >
-            #1 in top restaurants
+          <div class="text-center">
+            <p class="text-4xl">We Direct you to the</p>
+            <p class="mt-2 font-bold text-8xl">Right Restaurant</p>
           </div>
 
-          <div class="px-5 py-5">
-            <div class="flex gap-5">
-              <div class="w-3/5">
-                <div class="flex">
-                  <div
-                    class="w-10 h-10 bg-[#c4c4c4] overflow-hidden rounded-full"
-                  ></div>
-                  <div class="flex-grow pl-2">
-                    <p class="text-sm font-medium leading-snug">
-                      Some nice fancy restaurant
-                    </p>
-                    <div class="flex items-center text-black">
-                      <span class="inline-block mr-1">
-                        <MaterialIcon icon="place" class="text-xs" />
-                      </span>
+          <div class="w-3/5 mt-6 text-center">
+            <p class="text-sm">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Reprehenderit exercitationem molestias unde nisi tempore laborum
+              sint veniam in aperiam. Tenetur pariatur quos eveniet praesentium,
+              assumenda libero officia et facilis cupiditate.
+            </p>
 
-                      <span class="inline-block text-xs"
-                        >Stoke-on-Trent, Uk</span
-                      >
-                    </div>
-                  </div>
-                </div>
+            <div v-if="!user.loggedIn" class="flex justify-center gap-3 mt-6">
+              <AppButton
+                url="/auth?type=create"
+                :button="false"
+                title="Create Account"
+                class=""
+              />
 
-                <div class="mt-3 text-sm">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Laboriosam optio quo vero est magni, sint sed sunt atque
-                  recusandae, ex eaque quidem voluptatem exercitationem mollitia
-                  totam deleniti nemo excepturi error.<br />
-                </div>
-              </div>
-              <div class="flex flex-col w-2/5 gap-1">
-                <div v-for="i in 6" :key="i" class="flex justify-between">
-                  <p class="flex-grow text-xs leading-snug">Lorem Ipsum</p>
-                  <StarRating :count="false" />
-                </div>
-              </div>
+              <AppButton
+                url="/auth?type=login"
+                :button="false"
+                title="Login"
+                class=""
+              />
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="relative w-4/5 mx-auto top-[-90px]">
+        <div class="">
+          <div class="text-xl text-white">Browse Restaurants</div>
+        </div>
+
+        <div class="flex flex-col gap-3 mt-6">
+          <ARestaurantCard
+            v-for="(restaurant, i) in restaurants"
+            :key="i"
+            :restaurant="restaurant"
+            :editable="false"
+            :deletetable="false"
+            position
+            :position-number="i + 1"
+          />
         </div>
       </div>
     </div>
@@ -122,5 +81,34 @@
 <script>
 export default {
   name: 'LandingPage',
+
+  data() {
+    return {
+      loaded: false,
+    }
+  },
+
+  computed: {
+    user() {
+      return this.$store.state.user
+    },
+
+    restaurants() {
+      return this.$store.state.restaurants || []
+    },
+  },
+
+  mounted() {
+    this.getRestaurants()
+  },
+
+  methods: {
+    async getRestaurants() {
+      const restaurants = await this.$store.dispatch('getRestaurants', {})
+      if (restaurants) {
+        this.loaded = true
+      }
+    },
+  },
 }
 </script>

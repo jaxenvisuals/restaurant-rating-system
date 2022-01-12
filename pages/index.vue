@@ -115,7 +115,7 @@
             </div>
 
             <div class="mt-px">
-              <StarRating />
+              <StarRating :values="[]" />
             </div>
           </div>
         </div>

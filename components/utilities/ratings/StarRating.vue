@@ -4,17 +4,30 @@
       class="flex items-center mr-1 text-brand-yellow"
       :class="[{ 'gap-2': !tight }]"
     >
-      <MaterialIcon icon="star" :class="[starSize]" />
-      <MaterialIcon icon="star" :class="[starSize]" />
-      <MaterialIcon icon="star" :class="[starSize]" />
-      <MaterialIcon icon="star_half" :class="[starSize]" />
-      <MaterialIcon icon="star_outline" :class="[starSize]" />
+      <template v-for="(star, i) in values">
+        <MaterialIcon
+          v-if="star"
+          :key="i"
+          icon="star"
+          :class="[starSize, 'text-yellow-600']"
+        />
+        <MaterialIcon v-else :key="i" icon="star_outline" :class="[starSize]" />
+      </template>
     </div>
     <span
       v-if="count"
-      class="text-[10px] text-brand-gray leading-snug tracking-tight"
-      >2.4k</span
+      class="
+        ml-2
+        inline-block
+        text-brand-gray
+        leading-snug
+        tracking-tight
+        text-sm
+      "
     >
+      {{ count }}
+      <MaterialIcon icon="comment" class="text-xs" />
+    </span>
   </div>
 </template>
 
@@ -24,8 +37,8 @@ export default {
 
   props: {
     count: {
-      type: Boolean,
-      default: true,
+      type: [Number, Boolean],
+      default: false,
     },
 
     tight: {
@@ -36,6 +49,11 @@ export default {
     size: {
       type: String,
       default: null,
+    },
+
+    values: {
+      type: Array,
+      required: true,
     },
   },
 

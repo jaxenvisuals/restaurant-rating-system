@@ -40,17 +40,23 @@
 
               <div class="pl-4">
                 <p class="text-sm font-bold leading-snug">
-                  Some nice fancy restaurant
+                  {{ restaurant.name }}
                 </p>
                 <div class="flex items-center text-black">
                   <span class="inline-block mr-1">
                     <MaterialIcon icon="place" class="text-xs" />
                   </span>
 
-                  <span class="inline-block text-xs">Stoke-on-Trent, Uk</span>
+                  <span class="inline-block text-xs">{{
+                    restaurant.location
+                  }}</span>
                 </div>
                 <div class="mt-px">
-                  <StarRating />
+                  <StarRating
+                    :count="false"
+                    size="sm"
+                    :values="overall.rating"
+                  />
                 </div>
               </div>
             </div>
@@ -58,41 +64,45 @@
         </div>
 
         <div class="">
-          <div
-            class="
-              rounded-full
-              px-5
-              py-3
-              border border-[#c4c4c4]
-              text-black text-sm
-              font-bold
-              leading-snug
-            "
-          >
-            Cancel
-          </div>
+          <AppButton title="Cancel" class="" @click="hideModal" />
         </div>
       </div>
 
       <div class="mt-6">
         <div class="flex flex-col gap-2">
-          <AStarReviewCard
+          <AddRestaurantCard
             v-for="template in restaurantTemplate"
             :key="template.name"
             :template="template"
+            :form="form"
+            :restaurant="restaurant"
+            for-review
+            @input="updateForm(template.key, $event)"
           />
 
-          <div class="border rounded-xl px-4 py-3 shadow bg-white/60">
-            <div class="">
-              <p class="text-base font-bold">Rate your overall experience</p>
-            </div>
+          <div class="">
+            <AStarReviewCard
+              v-model="others"
+              :is-new="isNew"
+              :template="otherRatings"
+              placeholder=""
+              :review="review"
+            />
+          </div>
 
-            <div class="mt-4">
-              <StarRating size="xl" :count="false" :tight="false" />
-            </div>
+          <div class="">
+            <AStarReviewCard
+              v-model="overallRating"
+              :is-new="isNew"
+              :template="overallTemplate"
+              placeholder=""
+              :review="review"
+            />
           </div>
 
           <AStarReviewCard
+            v-model="comments"
+            :is-new="isNew"
             type="textarea"
             :template="{
               name: 'Do you have any other comments?',
@@ -100,43 +110,31 @@
                 'Type in any special comment about your experience below',
             }"
             placeholder="Type your comments here"
+            :review="review"
           />
         </div>
 
         <div class="flex-col flex mt-4">
-          <div
-            class="
-              rounded-full
-              text-center
-              w-full
-              bg-black
-              px-5
-              py-3
-              border border-black
-              text-white text-sm
-              font-bold
-              leading-snug
-            "
-          >
-            Submit Review
+          <AppButton
+            :title="isNew ? 'Submit Review' : 'Update Review'"
+            dark
+            class="mb-3"
+            :disabled="loading"
+            @click="processForm"
+          />
+
+          <div v-if="loading" class="my-2 text-center font-bold text-sm">
+            Loading...
           </div>
 
           <div
-            class="
-              w-full
-              text-center
-              mt-8
-              rounded-full
-              px-5
-              py-3
-              border border-[#c4c4c4]
-              text-black text-sm
-              font-bold
-              leading-snug
-            "
+            v-if="errorMessage && !loading"
+            class="my-2 text-center text-red-500 font-bold text-sm"
           >
-            Cancel
+            {{ errorMessage }}
           </div>
+
+          <AppButton :title="'Cancel'" @click="hideModal" />
         </div>
       </div>
     </div>
@@ -147,127 +145,186 @@
 export default {
   name: 'AddReview',
 
+  props: {
+    restaurant: {
+      type: Object,
+      required: true,
+    },
+
+    review: {
+      type: Object,
+      required: true,
+    },
+
+    new: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
   data: () => {
     return {
-      restaurantTemplate: {
-        typeOfService: {
-          name: 'Type of Service',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, illo! Sed vitae labore',
-          fields: [
-            {
-              name: 'FastFood',
-            },
-            {
-              name: 'A la Carte',
-            },
-            {
-              name: "Table D'Hote",
-            },
-          ],
-        },
-        typeOfFood: {
-          name: 'Type of Food',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, illo! Sed vitae labore',
-          fields: [
-            {
-              name: 'Asian',
-            },
-            {
-              name: 'Caribbean',
-            },
-            {
-              name: 'Oriental',
-            },
-            {
-              name: 'Italian',
-            },
-            {
-              name: 'American',
-            },
-            {
-              name: 'Traditional',
-            },
-          ],
-        },
-        typeOfOccassion: {
-          name: 'Type of Occassion',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, illo! Sed vitae labore',
-          fields: [
-            {
-              name: 'Family Meal',
-            },
-            {
-              name: 'Romantic Dinner',
-            },
-            {
-              name: 'Kids Meal',
-            },
-            {
-              name: 'Business Lunches',
-            },
-            {
-              name: 'View',
-            },
-          ],
-        },
-        diningOptions: {
-          name: 'Dining Options',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, illo! Sed vitae labore',
-          fields: [
-            {
-              name: 'Breakfase',
-            },
-            {
-              name: 'Lunch',
-            },
-            {
-              name: 'Dinner',
-            },
-            {
-              name: 'Supper',
-            },
-            {
-              name: 'Takeout',
-            },
-          ],
-        },
-        experience: {
-          name: 'General Experience',
-          description:
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime, illo! Sed vitae labore',
-          fields: [
-            {
-              name: 'Average expense of serving per head',
-            },
-            {
-              name: 'Quality of food',
-            },
-            {
-              name: 'Ambiance of the experience',
-            },
-            {
-              name: 'Quality of service',
-            },
-            {
-              name: 'Cleanliness',
-            },
-            {
-              name: 'Speed of service',
-            },
-            {
-              name: 'Value for money',
-            },
-            {
-              name: 'Allergy information provided',
-            },
-          ],
-        },
+      loading: false,
+      errorMessage: null,
+      form: {},
+      others: {},
+      comments: '',
+      otherRatings: {
+        name: 'Rate your some other options',
+        description:
+          'Rate each of these options to help others find the best restaurant',
+        fields: [
+          {
+            name: 'Expense',
+            key: 'expenseRating',
+          },
+          {
+            name: 'How was the Food?',
+            key: 'foodRating',
+          },
+          {
+            name: 'The Ambiance',
+            key: 'ambianceRating',
+          },
+          {
+            name: 'Service Delivery',
+            key: 'serviceRating',
+          },
+          {
+            name: 'Cleanliness',
+            key: 'cleanlinessRating',
+          },
+          {
+            name: 'Speed of Service',
+            key: 'speedRating',
+          },
+          {
+            name: 'Value for Money',
+            key: 'valueRating',
+          },
+          {
+            name: 'Allergy Information Provided',
+            key: 'allergyRating',
+          },
+        ],
       },
+      overallTemplate: {
+        name: 'Rate your overall experience',
+        description: '',
+        fields: [
+          {
+            name: 'Overal Experience',
+            key: 'overallRating',
+          },
+        ],
+      },
+      overallRating: {},
     }
+  },
+
+  computed: {
+    user() {
+      return this.$store.state.user
+    },
+
+    isNew() {
+      return this.new
+    },
+
+    restaurantTemplate() {
+      return this.$store.state.restaurantTemplate
+    },
+
+    overall() {
+      let overall = {}
+      if (this.restaurant._id) {
+        this.restaurant.ratings.forEach((rating) => {
+          if (rating.name === 'Overall Delivery') overall = rating
+        })
+      }
+
+      return overall
+    },
+  },
+
+  mounted() {
+    if (this.new) {
+      this.form = {}
+    } else {
+      this.form = {
+        cuisine: this.review.cuisine,
+        service: this.review.service,
+        meals: this.review.meals,
+        occasion: this.review.occasion,
+      }
+    }
+  },
+
+  methods: {
+    hideModal(e = false) {
+      this.$emit('close', e)
+    },
+
+    updateForm(key, value) {
+      this.form[key] = value
+    },
+
+    processForm() {
+      if (!this.overallRating.overallRating) {
+        alert('Sorry, You have to give an overall rating.')
+        return
+      }
+
+      const ratings = {
+        ...this.others,
+        ...this.overallRating,
+      }
+
+      for (const key in ratings) {
+        if (!ratings[key]) ratings[key] = 0
+      }
+
+      const form = {
+        restaurantID: this.restaurant._id,
+        userID: this.user._id,
+        comment: this.comments,
+        ...this.form,
+        ...ratings,
+      }
+
+      this.saveReview(form)
+    },
+
+    saveReview(form) {
+      this.loading = true
+      this.errorMessage = null
+      if (!this.new) {
+        delete form.userID
+        delete form.restaurantID
+        delete form.id
+      }
+
+      return this.$axios({
+        method: 'POST',
+        url: this.new ? 'api/review' : 'api/review/' + this.review.id,
+        data: JSON.stringify(form),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => {
+          console.log(res)
+          this.errorMessage = null
+          this.hideModal(true)
+        })
+        .catch((err) => {
+          this.errorMessage = 'Sorry! We were unable to complete this request'
+          console.log(err)
+        })
+        .finally(() => {
+          this.loading = false
+        })
+    },
   },
 }
 </script>

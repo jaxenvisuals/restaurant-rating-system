@@ -1,7 +1,24 @@
 export default {
+  server: {
+    port: 3000,
+    host: '0.0.0.0',
+  },
+
+  publicRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL,
+    },
+  },
+
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL,
+    },
+  },
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'restaurant-rating-system',
+    title: 'Restaurant Management System',
     htmlAttrs: {
       lang: 'en',
     },
@@ -32,7 +49,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '~plugins/vuelidate.js', ssr: false }, '~plugins/id.js'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   // Auto import components even in nested directories

@@ -18,13 +18,16 @@ export default {
   mounted() {
     const user = JSON.parse(localStorage.getItem('user'))
     if (user && user._id) {
-      this.$store.commit('setUser', {
-        loggedIn: true,
-        ...user,
-      })
+      if (user.admin) {
+        this.$store.commit('setUser', {
+          loggedIn: true,
+          ...user,
+        })
+        this.loaded = true
+      } else {
+        this.$router.push('/home')
+      }
     }
-
-    this.loaded = true
   },
 }
 </script>
