@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div v-if="!loaded" class="mt-[150px] text-center font-bold text-sm">
-      Loading...
+    <div v-if="!loaded" class="mt-[250px] text-center font-bold text-sm">
+      {{ loadingText }}
     </div>
     <div v-else>
       <div class="bg-[#c4c4c4] flex justify-center mt-[94px] relative">
@@ -85,6 +85,7 @@ export default {
   data() {
     return {
       loaded: false,
+      loadingText: 'Loading...',
     }
   },
 
@@ -99,11 +100,20 @@ export default {
   },
 
   mounted() {
+    setTimeout(() => {
+      if (this.loading) {
+        this.loadingText = 'Loading... Almost there...'
+      }
+    }, 3500)
+
     this.getRestaurants()
   },
 
   methods: {
     async getRestaurants() {
+      this.loadingText = 'Loading'
+      this.loading = true
+
       const restaurants = await this.$store.dispatch('getRestaurants', {})
       if (restaurants) {
         this.loaded = true

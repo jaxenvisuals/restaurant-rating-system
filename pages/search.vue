@@ -1,9 +1,9 @@
 <template>
   <div class="flex flex-col items-center w-full mt-[94px]">
-    <div v-if="searching" class="my-6 text-center font-bold text-sm">
-      Loading...
+    <div v-if="searching" class="mb-6 mt-[130px] text-center font-bold text-sm">
+      {{ loadingText }}
     </div>
-    <div v-if="restaurants.length" class="w-4/5 mt-6">
+    <div v-if="restaurants.length && !searching" class="w-4/5 mt-6">
       <div class="">
         <div class="text-xl">{{ restaurants.length }} Search Results</div>
       </div>
@@ -53,6 +53,11 @@
                   />
                 </div>
               </div>
+              <div class="mt-px text-xs">
+                <div class="">
+                  £{{ restaurant.cost.min }} - £{{ restaurant.cost.max }}
+                </div>
+              </div>
             </div>
 
             <div class="flex items-center mt-px text-black">
@@ -72,7 +77,10 @@
         </nuxt-link>
       </div>
     </div>
-    <div v-else-if="!searching" class="my-6 text-center font-bold text-sm">
+    <div
+      v-else-if="!searching"
+      class="mb-6 mt-[130px] text-center font-bold text-sm"
+    >
       No search result
     </div>
   </div>
@@ -81,6 +89,19 @@
 <script>
 export default {
   name: 'SearchResults',
+
+  data() {
+    return {
+      loadingText: 'Loading...',
+      query: {
+        search: '',
+        cuisine: '',
+        occasion: '',
+        minCost: null,
+        maxCost: null,
+      },
+    }
+  },
 
   computed: {
     searching() {
@@ -99,6 +120,73 @@ export default {
         })
 
         return overall
+      }
+    },
+  },
+
+  watch: {
+    searching() {
+      this.watchLoader()
+    },
+  },
+
+  mounted() {
+    this.$store.commit('setSearch', true)
+
+    this.watchLoader()
+    this.search()
+  },
+
+  methods: {
+    watchLoader() {
+      this.query.search = this.$route.query.search || ''
+      this.query.cuisine = this.$route.query.cuisine || ''
+      this.query.occasion = this.$route.query.occasion || ''
+      this.query.minCost = this.$route.query.minCost || null
+      this.query.maxCost = this.$route.query.maxCost || null
+
+      setTimeout(() => {
+        if (this.searching) {
+          this.loadingText = 'Loading... Almost there...'
+        } else {
+          this.loadingText = 'Loading...'
+        }
+      }, 3500)
+    },
+
+    async search() {
+      const query = []
+      let i = 0
+      let str = '?'
+
+      if (this.query.search)
+        query.push({ name: 'search', value: this.query.search })
+      if (this.query.cuisine)
+        query.push({ name: 'cuisine', value: this.query.cuisine })
+      if (this.query.occasion)
+        query.push({ name: 'occasion', value: this.query.occasion })
+      if (this.query.minCost > 0)
+        query.push({ name: 'minCost', value: this.query.minCost })
+      if (this.query.maxCost > 0)
+        query.push({ name: 'maxCost', value: this.query.maxCost })
+
+      if (query.length) {
+        query.forEach((q) => {
+          i++
+          str += `${q.name}=${q.value}${i === query.length ? '' : '&'}`
+        })
+      }
+
+      const restaurants = await this.$store.dispatch('getRestaurants', {
+        query: `${str}`,
+      })
+
+      if (restaurants) {
+        this.$store.commit('setSearch', false)
+
+        return restaurants
+      } else {
+        this.$store.commit('setSearch', false)
       }
     },
   },

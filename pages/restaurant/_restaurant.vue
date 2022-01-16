@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!loaded" class="mt-[150px] text-center font-bold text-sm">
-      Loading...
+      {{ loadingText }}
     </div>
     <div v-else>
       <div class="mt-[110px] relative w-4/5 mx-auto">
@@ -37,14 +37,18 @@
                     restaurant.location
                   }}</span>
                 </div>
-                <div class="mt-px">
+                <div class="mt-px flex items-center">
                   <StarRating
+                    class="mr-2"
                     :count="
                       restaurant.reviews ? restaurant.reviews.length : false
                     "
                     size="xl"
                     :values="overall.rating"
                   />
+                  <div class="text-sm">
+                    £{{ restaurant.cost.min }} - £{{ restaurant.cost.max }}
+                  </div>
                 </div>
               </div>
               <p class="pt-2 text-sm leading-snug text-black">
@@ -162,6 +166,7 @@ export default {
 
   data() {
     return {
+      loadingText: 'Loading...',
       loaded: false,
       restaurant: {},
       modalVisible: false,
@@ -192,11 +197,19 @@ export default {
   },
 
   mounted() {
+    setTimeout(() => {
+      if (!this.loaded) {
+        this.loadingText = 'Loading... Almost there...'
+      }
+    }, 3500)
+
     this.getRestaurant()
   },
 
   methods: {
     async getRestaurant() {
+      this.loadingText = 'Loading'
+      this.loaded = false
       const restaurant = await this.$store.dispatch('getRestaurant', {
         id: this.id,
       })

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!loaded" class="mt-[150px] text-center font-bold text-sm">
-      Loading...
+      {{ loadingText }}
     </div>
     <div
       v-else-if="user.loggedIn && user.admin"
@@ -48,6 +48,7 @@ export default {
 
   data() {
     return {
+      loadingText: 'Loading...',
       loaded: false,
       isNew: true,
       visible: false,
@@ -66,6 +67,14 @@ export default {
   },
 
   mounted() {
+    setTimeout(() => {
+      if (!this.loaded) {
+        this.loadingText = 'Loading... Almost there...'
+      } else {
+        this.loadingText = 'Loading...'
+      }
+    }, 3500)
+
     this.getRestaurants()
   },
 
@@ -113,6 +122,7 @@ export default {
     },
 
     async getRestaurants() {
+      this.loaded = false
       const restaurants = await this.$store.dispatch('getRestaurants', {})
       if (restaurants) {
         this.loaded = true
