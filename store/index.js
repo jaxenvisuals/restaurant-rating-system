@@ -159,6 +159,7 @@ export const actions = {
       .then(({ data }) => {
         let refined = []
         if (data.length) {
+          console.log(data)
           refined = data.map((res) => {
             return {
               ...res,

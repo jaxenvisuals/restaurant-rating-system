@@ -46,13 +46,18 @@
                   restaurant.location
                 }}</span>
               </div>
-              <div class="mt-px">
+              <div class="mt-px flex items-center">
                 <StarRating
+                  class="mr-3"
                   :count="
                     restaurant.reviews ? restaurant.reviews.length : false
                   "
                   :values="overall.rating"
                 />
+
+                <p class="text-xs">
+                  £{{ restaurant.cost.min }} - £{{ restaurant.cost.max }}
+                </p>
               </div>
             </div>
           </div>
